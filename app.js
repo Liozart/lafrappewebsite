@@ -3,11 +3,12 @@ const dbName = "lafrappeshipdb";
 const dbIp = "localhost:27017";
 const collectionNameCommandsWaiting = "waiting";
 const collectionNameCommandsDone = "done";
+const merch = require("./merch");
 
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser')
-var jsonParser = bodyParser.json()
+var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json();
 
 //DB
 var MongoClient = require('mongodb').MongoClient;
@@ -24,7 +25,7 @@ var transporter = nodemailer.createTransport({
   });
 
 //Create waiting commands and done collection
-MongoClient.connect(url, function(err, db) {
+/*MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db(dbName);
     dbo.createCollection(collectionNameCommandsWaiting, function(err, res) {
@@ -36,7 +37,7 @@ MongoClient.connect(url, function(err, db) {
         db.close();
       });
     });
-});
+});*/
 
 //Webiste serving
 app.use(express.static('lafrappewebsite'));
@@ -67,7 +68,7 @@ app.post("/add", jsonParser, (req, res) => {
                   console.log(error);
                 } else {
                   console.log('Email sent: ' + info.response);
-                  res.status(200).send();
+                  res.status(200).send("Ok");
                 }
               });
           db.close();
@@ -81,9 +82,19 @@ app.get("/get", (req, res) => {
         if (err) throw err;
         var dbo = db.db(dbName);
         dbo.collection(collectionNameCommandsWaiting).find({}).toArray(function(err, result) {
-          if (err) throw err;
-          res.send(result);
-          db.close();
+            if (err) throw err;
+            //Add articles names with the quantites
+            var cmdToString = "";
+            result.forEach(function(item, index) {
+                item.articles.forEach(function(num, index) {
+                    if (num > 0){
+                        cmdToString += num + "x " + merch[index].name + ", ";
+                    }
+                });
+                item.toString = cmdToString;
+            });
+            res.send(result);
+            db.close();
         });
     });
 });
