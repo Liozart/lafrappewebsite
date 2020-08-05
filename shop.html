@@ -16,7 +16,7 @@
 </ul>
 <div id="shop_title">Shop</div>
 <div id="shop_validate">
-    <form class="coordinates_form">
+    <form class="coordinates_form" action="#">
         <fieldset>
             <h2>Coordonnées</h2>
             <table>
@@ -33,9 +33,17 @@
         </fieldset>
         <fieldset>
             <h2>Payement</h2>
-            <label for="carte">Nom : </label><input id="carte" type="text" placeholder="Numéro de carte" autofocus required/>
+			<table>
+                <tr>
+                    <td><label for="carte">Numéro de carte : </label><input id="carte" type="text" placeholder="Numéro de carte" required/></td>
+                    <td><label for="carte">Date d'expiration : </label><input id="date" type="text" placeholder="Date d'expiration" required/></td>
+					<td><label for="carte">Code de sécurité : </label><input id="securite" type="text" placeholder="Code de sécurité" required/></td>
+				</tr>
+            </table> 
         </fieldset>
-        <input type="submit" value="Confirmer">
+        <fieldset>
+        <input type="submit" value="Confirmer adresse et payement" onclick="submitForm()"/>
+		</fieldset>
     </form>
     <div id="panier_res">
         <div id="res_total">Résumé de la commande : 0.-</div>
@@ -55,6 +63,12 @@
     var validateState = false;
     var totalPrice = 0;
     generateItemHTML();
+	
+	//Fais les trucs
+	function submitForm() {
+		var dude = { nom : document.getElementById("nom"), email : document.getElementById("email"), 
+			adresse: }
+	}
 
     //Génère les articles
     function generateItemHTML(){
