@@ -652,3 +652,17 @@ footer {
     text-decoration: none;
     color: #ffffff;
 }
+
+.movietitle {
+    font-size: 30pt;
+    color: #f7b733;
+    text-shadow: 1px 1px #0e0d15;
+    text-align: center;
+}
+
+#movieparagraph {
+    font-size: 20px;
+    width: 45%;
+    float: right;
+    margin: 10px;
+}

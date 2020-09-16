@@ -27,6 +27,9 @@ var transporter = nodemailer.createTransport({
     }
   });
 
+  //Payment
+  const stripe = require("stripe")("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
+
 //Allow cross-platform requesting
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -35,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 //Create waiting commands and done collection
-/*MongoClient.connect(url, function(err, db) {
+MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db(dbName);
     dbo.createCollection(collectionNameCommandsWaiting, function(err, res) {
@@ -47,15 +50,33 @@ app.use(function(req, res, next) {
         db.close();
       });
     });
-});*/
+});
 
-//Webiste serving
+//Website serving -----------------------
 app.use(express.static('lafrappewebsite'));
 app.get('/', (req, res) => {
   res.sendFile("index.html");
 });
 
-//API calls
+//Payment API -----------------------
+/*app.post("/create-payment-intent", jsonParser, async (req, res) => {
+  var c = parseFloat(req.body.price);
+  console.log(c);
+  c = c * 100;
+  console.log(c);
+  const price = c;
+  console.log("net : " + price);
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: price,
+    currency: "chf"
+  });
+  res.send({
+    clientSecret: paymentIntent.client_secret
+  });
+});
+
+//Commands management API -----------------------
 //post a new command
 app.post("/add", jsonParser, (req, res) => {
     MongoClient.connect(url, function(err, db) {
@@ -172,7 +193,7 @@ app.post("/inprogress", jsonParser, (req, res) => {
           db.close();
         });
     });
-});
+});*/
 
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`)
