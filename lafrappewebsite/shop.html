@@ -10,11 +10,11 @@
 <body>
 <ul id="nav">
     <li id=nav_img></li>
-    <a href="index.html"><li>Accueil</li></a>
+    <a href="kentusfolio.html"><li>Accueil</li></a>
     <li id="shop_total">Panier : 0 articles, 0.-</li>
     <a href="#"><li id="toggle_panier" onclick="toggleValidation()">Valider panier</li></a>
 </ul>
-<div id="shop_title">Shop</div>
+<div id="shop_title">La Frapperie</div>
 <div id="shop_validate">
     <form class="coordinates_form" action="payment.html">
         <fieldset>
@@ -42,7 +42,6 @@
     </div>
 </div>
 <section id="shop_section">
-    Shop bientôt en ligne !
     <!-- Les articles sont générés ici -->
 </section>
 <footer>La Frappe Society - Avenue de Thônex 10, 1225 Genève - lafrappesoc@gmail.com - +41 78 603 85 16</footer>
@@ -54,7 +53,7 @@
     var validateState = false;
     var totalPrice = 0;
 
-    //generateItemHTML();
+    generateItemHTML();
 	
 	//Exécute le payement
 	function submitForm() {
@@ -79,49 +78,66 @@
     //Génère les articles
     function generateItemHTML(){
         merch.forEach(function(item, index) {
-            //Ajout shop_item div
+            //Ajout shop_item div------------------------------------------------
             var it = document.createElement("div");
             it.className = "shop_item";
             document.getElementById("shop_section").appendChild(it);
-            //Ajout item image
+            //Ajout item image------------------------------------------------
             var img = document.createElement("img");
             img.className = "img_item";
+            img.id = "shopimg_" + index;
             img.src = item.image;
             it.appendChild(img);
-            //Ajout item_infos div
+            //Ajout item_infos div------------------------------------------------
             var inf = document.createElement("div");
             inf.className = "item_infos";
             it.appendChild(inf);
-            //Ajout item_title div
+            //Ajout item_title div------------------------------------------------
             var titl = document.createElement("div");
             titl.className = "item_title";
             titl.innerText = item.name;
             inf.appendChild(titl);
-            //Ajout item_price div
+            //Ajout item_price div------------------------------------------------
             var pri = document.createElement("div");
             pri.className = "item_price";
             inf.appendChild(pri);
             var b = document.createElement("b");
             b.innerText = item.price + ".-";
             pri.appendChild(b);
-            //Ajout item_quote div
-            var quo = document.createElement("div");
+            //Ajout item_quote div------------------------------------------------
+            var quo = document.createElement("p");
             quo.className = "item_quote";
             inf.appendChild(quo);
             var i = document.createElement("i");
-            i.innerText = item.quote;
+            i.innerHTML = item.quote;
             quo.appendChild(i);
-            //Ajout control_number div
+            //Ajout select_color button------------------------------------------------
+            var colori = document.createElement("div");
+            colori.className = "shop_colors";
+            colori.innerText = "Couleur : ";
+            inf.appendChild(colori);
+            var colour = document.createElement("select");
+            colour.name = "colorselect";
+            colour.className = "shop_colors"
+            inf.appendChild(colour);
+            //Ajouts de option pour la couleur------------------------------------------------
+            item.colors.forEach(colo => {
+                var opt = document.createElement("option");
+                opt.value = colo;
+                opt.innerText = colo;
+                colour.appendChild(opt);
+            });
+            //Ajout control_number div------------------------------------------------
             var pan = document.createElement("div");
             pan.className = "control_number";
             pan.id = "control_panier_" + index;
             pan.innerText = "Ajouté au panier : 0";
             it.appendChild(pan);
-            //Ajout shop_control div
+            //Ajout shop_control div------------------------------------------------
             var con = document.createElement("div");
             con.className = "shop_controls";
             it.appendChild(con);
-            //Ajout add_article button
+            //Ajout add_article button------------------------------------------------
             var a1 = document.createElement("a");
             a1.href = "#";
             con.appendChild(a1);
@@ -131,7 +147,7 @@
             add.onclick = ev => addArticle(index);
             a1.appendChild(add);
             con.appendChild(document.createElement("br"));
-            //Ajout delete_article button
+            //Ajout delete_article button------------------------------------------------
             var a2 = document.createElement("a");
             a2.href = "#";
             con.appendChild(a2);
@@ -140,6 +156,19 @@
             del.src = "img_shop/delete.png";
             del.onclick = ev => removeArticle(index);
             a2.appendChild(del);
+            //Ajouts prev et next boutons-----------------------------------------------
+            var prev = document.createElement("a");
+            prev.className = "prev";
+            prev.innerHTML = " &#10094; ";
+            prev.href = "#";
+            prev.onclick = plusSlides(item.image, -1, index);
+            it.appendChild(prev);
+            var next = document.createElement("a");
+            next.className = "next";
+            next.innerHTML = " &#10095; ";
+            next.href = "#";
+            //prev.onclick = plusSlides(item.image, 1, index);
+            it.appendChild(next);
         });
     }
 
@@ -200,6 +229,27 @@
             sec.style.display = "block";
             pan.innerText = "Valider panier";
         }
+    }
+
+    //Change shop image
+    function plusSlides(name, dir, ind){
+        var filename;
+        var index = name.charAt(name.length - 4);
+        //next image
+        if (dir === 1) {
+            if (index === 4)
+                filename = name.setCharAt(filename, -4, 0);
+            else
+                filename = name.setCharAt(filename, -4, (index + 1));
+        }
+        else
+        {
+            if (index === 0)
+                filename = name.setCharAt(filename, -4, 4);
+            else
+                filename = name.setCharAt(filename, -4, (index - 1));
+        }
+        document.getElementById("shopimg_" + ind).src = filename;
     }
 </script>
 </body>

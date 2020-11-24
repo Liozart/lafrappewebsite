@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 //Create waiting commands and done collection
-MongoClient.connect(url, function(err, db) {
+/*MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db(dbName);
     dbo.createCollection(collectionNameCommandsWaiting, function(err, res) {
@@ -50,12 +50,12 @@ MongoClient.connect(url, function(err, db) {
         db.close();
       });
     });
-});
+});*/
 
 //Website serving -----------------------
 app.use(express.static('lafrappewebsite'));
 app.get('/', (req, res) => {
-  res.sendFile("index.html");
+  res.sendFile(__dirname + "/lafrappewebsite/kentusfolio.html");
 });
 
 //Payment API -----------------------

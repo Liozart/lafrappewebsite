@@ -3,7 +3,8 @@ html, body {
   padding: 0;
   margin: 0;
   overflow: hidden;
-    font-family: "monaco";
+  font-family: "monaco";
+  scroll-behavior: smooth;  
 }
 
 body {
@@ -45,7 +46,7 @@ p {
     margin-top: 10px;
     padding: 10px 1.8%;
     color: #000;
-    border-left: 2px solid #f7b733;
+    border-left: 2px solid #a002fc;
 }
 
 #nav #nav_img {
