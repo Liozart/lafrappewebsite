@@ -47,11 +47,23 @@
 <footer>La Frappe Society - Avenue de Thônex 10, 1225 Genève - lafrappesoc@gmail.com - +41 78 603 85 16</footer>
 <script type="text/javascript" src="merch.js"></script>
 <script>
-    var articles = [];
+    /* Format du panier :
+        articles[n][c] ou n est l'index de l'article (par rapport au nombre total d'articles) et c la couleur
+        un t-shirt bleu (n = 0 et c = 1) ajouté au panier est donc articles[0][1] += 1
+    */
+    var articles = [[]];
+    //Index actuel de chaque image d'article (pour slideshow)
+    var articlesImgsCurrentIndexes = [];
     for (var i = 0; i < merch.length; i++)
-        articles[i] = 0;
+    {
+        articles[i] = [];
+        articlesImgsCurrentIndexes[i] = 0;
+    }
     var validateState = false;
     var totalPrice = 0;
+    var isCookieSet = false;
+    document.cookie = "total=" + 0;
+
 
     generateItemHTML();
 	
@@ -72,22 +84,31 @@
             },
             body: JSON.stringify(shipAddr)
         })
-        .then(document.cookie = "total=" + totalPrice);
+        .then(() => { 
+            document.cookie = "total=" + totalPrice;
+            isCookieSet = true;
+        });
     }
 
     //Génère les articles
     function generateItemHTML(){
+        var i = 0;
         merch.forEach(function(item, index) {
             //Ajout shop_item div------------------------------------------------
             var it = document.createElement("div");
             it.className = "shop_item";
             document.getElementById("shop_section").appendChild(it);
+            //Ajout lien vers image----------------------------------------------
+            var imga = document.createElement("a");
+            imga.href = item.images[0];
+            it.appendChild(imga);
             //Ajout item image------------------------------------------------
             var img = document.createElement("img");
             img.className = "img_item";
             img.id = "shopimg_" + index;
-            img.src = item.image;
-            it.appendChild(img);
+            img.src = item.images[0];
+            imga.appendChild(img);
+            articlesImgsCurrentIndexes[i] = 0;
             //Ajout item_infos div------------------------------------------------
             var inf = document.createElement("div");
             inf.className = "item_infos";
@@ -112,21 +133,30 @@
             i.innerHTML = item.quote;
             quo.appendChild(i);
             //Ajout select_color button------------------------------------------------
-            var colori = document.createElement("div");
-            colori.className = "shop_colors";
-            colori.innerText = "Couleur : ";
-            inf.appendChild(colori);
-            var colour = document.createElement("select");
-            colour.name = "colorselect";
-            colour.className = "shop_colors"
-            inf.appendChild(colour);
-            //Ajouts de option pour la couleur------------------------------------------------
-            item.colors.forEach(colo => {
-                var opt = document.createElement("option");
-                opt.value = colo;
-                opt.innerText = colo;
-                colour.appendChild(opt);
-            });
+            if (item.colors.length > 0)
+            {
+                var colori = document.createElement("div");
+                colori.className = "shop_colors";
+                colori.innerText = "Couleur : ";
+                inf.appendChild(colori);
+                var colour = document.createElement("select");
+                colour.name = "colorselect";
+                colour.className = "shop_colors"
+                inf.appendChild(colour);
+                //Ajouts de option pour la couleur------------------------------------------------
+                var k = 0;
+                item.colors.forEach(colo => {
+                    var opt = document.createElement("option");
+                    opt.value = k;
+                    opt.innerText = colo;
+                    colour.appendChild(opt);
+                    //Finish init articles array
+                    articles[index][k] = 0;
+                    k++;
+                });
+            }
+            else
+                articles[index][0] = 0;
             //Ajout control_number div------------------------------------------------
             var pan = document.createElement("div");
             pan.className = "control_number";
@@ -144,7 +174,10 @@
             var add = document.createElement("img");
             add.className = "add_article";
             add.src = "img_shop/add.png";
-            add.onclick = ev => addArticle(index);
+            if (item.colors.length > 0)
+                add.onclick = ev => addArticle(index, colour.value);
+            else
+                add.onclick = ev => addArticle(index, -1);
             a1.appendChild(add);
             con.appendChild(document.createElement("br"));
             //Ajout delete_article button------------------------------------------------
@@ -157,43 +190,51 @@
             del.onclick = ev => removeArticle(index);
             a2.appendChild(del);
             //Ajouts prev et next boutons-----------------------------------------------
-            var prev = document.createElement("a");
-            prev.className = "prev";
-            prev.innerHTML = " &#10094; ";
-            prev.href = "#";
-            prev.onclick = plusSlides(item.image, -1, index);
-            it.appendChild(prev);
-            var next = document.createElement("a");
-            next.className = "next";
-            next.innerHTML = " &#10095; ";
-            next.href = "#";
-            //prev.onclick = plusSlides(item.image, 1, index);
-            it.appendChild(next);
+            if (item.images.length > 1)
+            {
+                var prev = document.createElement("a");
+                prev.className = "prev";
+                prev.innerHTML = " &#10094; suiv.";
+                prev.href = "#";
+                prev.onclick = ev => plusSlides(img, item.images, -1, index);
+                it.appendChild(prev);
+                var next = document.createElement("a");
+                next.className = "next";
+                next.innerHTML = " préc. &#10095;";
+                next.href = "#";
+                next.onclick = ev => plusSlides(img, item.images, 1, index);
+                it.appendChild(next);
+            }
+            i++;
         });
     }
 
     //Ajoute un article au panier
-    function addArticle(articleIndex) {
+    function addArticle(articleIndex, color) {
         totalPrice += parseInt(merch[articleIndex].price);
-        articles[articleIndex]++;
+        if (color !== -1)
+            articles[articleIndex][color]++;
+        else
+            articles[articleIndex][0]++;
         document.getElementById("shop_total").innerText = "Panier : " + totalArticles() + " articles" + ", " + totalPrice + ".-";
-        document.getElementById("control_panier_" + articleIndex).innerText = "Ajouté au panier : " + articles[articleIndex];
+        var t = 0;
+        articles[articleIndex].forEach(e => (t += e));
+        document.getElementById("control_panier_" + articleIndex).innerText = "Ajouté au panier : " + t;
     }
 
     //Supprime du panier le ou les articles du même type
     function removeArticle(articleIndex) {
-        totalPrice -= parseInt(merch[articleIndex].price) * articles[articleIndex];
-        articles[articleIndex] = 0;
+        totalPrice -= parseInt(merch[articleIndex].price) * articles[articleIndex][0];
+        articles[articleIndex].forEach(e => (e = 0));
         document.getElementById("shop_total").innerText = "Panier : " + totalArticles() + " articles"  + ", " + totalPrice + ".-";
         document.getElementById("control_panier_" + articleIndex).innerText = "Ajouté au panier : 0";
+        console.log(articles);
     }
 
     //Retourne le nombre total d'articles du panier
     function totalArticles(){
         var t = 0;
-        articles.forEach(function (n) {
-            t += n;
-        });
+        articles.forEach(e => e.forEach(n => t += n));
         return t;
     }
 
@@ -209,18 +250,25 @@
             sec.style.visibility = "hidden";
             sec.style.display = "none";
             pan.innerText = "Retour au shop";
-            //Mise à jour du résumé
+            //Màj total
             document.getElementById("res_total").innerText = "Résumé de la commande : " + totalPrice + ".-";
             var list = document.getElementById("panier_res_list");
+            //Mise à jour du résumé
             while (list.firstChild) {
                 list.removeChild(list.lastChild);
             }
             articles.forEach(function (item, index) {
-                if (item !== 0) {
-                    var li = document.createElement("li");
-                    li.innerText = merch[index].name + " : " + item + "x";
-                    list.appendChild(li);
-                }
+                item.forEach(function (it2, ind2) {
+                    if (it2 !== 0)
+                    {
+                        var li = document.createElement("li");
+                        if (merch[index].colors[0] === undefined)
+                            li.innerText = merch[index].name + " : " + it2;
+                        else
+                            li.innerText = merch[index].name + " " + merch[index].colors[ind2] + " : " + it2;
+                        list.appendChild(li);
+                    }
+                });
             });
         } else {
             val.style.visibility = "hidden";
@@ -231,26 +279,20 @@
         }
     }
 
-    //Change shop image
-    function plusSlides(name, dir, ind){
-        var filename;
-        var index = name.charAt(name.length - 4);
-        //next image
-        if (dir === 1) {
-            if (index === 4)
-                filename = name.setCharAt(filename, -4, 0);
-            else
-                filename = name.setCharAt(filename, -4, (index + 1));
-        }
-        else
-        {
-            if (index === 0)
-                filename = name.setCharAt(filename, -4, 4);
-            else
-                filename = name.setCharAt(filename, -4, (index - 1));
-        }
-        document.getElementById("shopimg_" + ind).src = filename;
+    //Change l'image d'un article
+    function plusSlides(node, imgs, dir, index){
+        if ((articlesImgsCurrentIndexes[index] + dir) == imgs.length)
+        articlesImgsCurrentIndexes[index] = 0;
+            else if ((articlesImgsCurrentIndexes[index] + dir == -1))
+            articlesImgsCurrentIndexes[index] = imgs.length - 1;
+                else articlesImgsCurrentIndexes[index] = articlesImgsCurrentIndexes[index] + dir;
+        node.src = imgs[articlesImgsCurrentIndexes[index]];
     }
+
+    window.onbeforeunload = function(){
+        if (!isCookieSet)
+            document.cookie = "total=" + 0;
+    };
 </script>
 </body>
 </html>

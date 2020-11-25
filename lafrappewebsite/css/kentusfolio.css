@@ -1,8 +1,111 @@
+@font-face {
+    font-family: 'GlitchedCity';
+    src: url("../fonts/CFGlitchCity-Regular.ttf");
+}
+
 html {
     scroll-behavior: smooth;
   }
 
-.shopselect_logo{
+.square_container{
+    position: absolute;
+    left: 10%;
+    width: 80%;
+    height: 50%;
+    background-color: cyan;
+}
+
+.square{
+    position: absolute;
+}
+
+#square_1{
+    left: 5%;
+    top: 5%;
+    width: 30%;
+    height: 30%;
+    background-color: violet;
+}
+
+#square_2{
+    left: 5%;
+    top: 37%;
+    width: 30%;
+    height: 65%;
+    background-color: violet;
+}
+
+#square_3{
+    left: 37%;
+    top: 5%;
+    width: 30%;
+    height: 50%;
+    background-color: violet;
+}
+
+#square_4{
+    left: 37%;
+    top: 57%;
+    width: 30%;
+    height: 50%;
+    background-color: violet;
+}
+
+#square_5{
+    left: 69%;
+    top: 5%;
+    width: 30%;
+    height: 55%;
+    background-color: violet;
+}
+
+#square_6{
+    left: 69%;
+    top: 62%;
+    width: 30%;
+    height: 55%;
+    background-color: violet;
+}
+
+.square_img {
+    width: 100%; /* or any custom size */
+    height: 100%; 
+    object-fit: contain;
+
+    opacity: 1;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+
+.middle {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  
+  .square:hover .square_img {
+    opacity: 0.3;
+  }
+  
+  .square:hover .middle {
+    opacity: 1;
+  }
+
+.square_linktoproject {
+    background-color: cyan;
+    color: black;
+    font-size: 10px;
+    padding: 16px 32px;
+    text-decoration: blueviolet;
+    font-family: 'GlitchedCity';
+}
+
+/*.shopselect_logo{
     position: absolute;
     width: 100%;
     height: 35%;
@@ -26,4 +129,4 @@ html {
     position: absolute;
     right: 10%;
     width: 30%;
-}
+}*/
